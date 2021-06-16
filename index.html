@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+/* CSS portion, adding styles for all objects */
+#stopwatch {
+    display: inline-block;
+    width: 500px;
+    margin-left: 90%;
+    font-size: 40px;
+}
+#drag_object {
+    display:inline-block;
+    background-color: #FFF3CC;
+    border: #DFBC6A 1px solid;
+    width: 50px; 
+    height: 50px;
+    margin: 20px;
+    padding: 8px;
+    font-size: 18px;
+    text-align: center;
+    box-shadow: 2px 2px 2px #999;
+    cursor: move;
+}
+#drop_zone1 {
+    display:inline-block;
+    width: 200px; 
+    height: 200px;
+    margin: 65px;
+    padding: 8px;
+    font-size: 18px;
+    text-align: center;
+    cursor: move;
+}
+#drop_zone2 {
+    display:inline-block;
+    width: 200px; 
+    height: 200px;
+    margin: 65px;
+    padding: 8px;
+    font-size: 18px;
+    text-align: center;
+    cursor: move;
+}
+#drop_zone3 {
+    display:inline-block;
+    width: 200px; 
+    height: 200px;
+    margin: 65px;
+    padding: 8px;
+    font-size: 18px;
+    text-align: center;
+    cursor: move;
+}
+#drop_zone4 {
+    display:inline-block;
+    width: 200px; 
+    height: 200px;
+    margin: 65px;
+    padding: 8px;
+    font-size: 18px;
+    text-align: center;
+    cursor: move;
+}
+
+</style>
+<!-- html portion -->
+<body onload="myOnload()">
+    <label id = "stopwatch"> 0:0 </label> 
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <img src="Images/landfill.png" id="drop_zone1" ondragenter="drag_enter(event)" ondrop="drag_drop(event)" ondragover="return false" ondragleave="drag_leave(event)" ></div>
+    <img src="Images/recycle.png" id="drop_zone2" ondragenter="drag_enter(event)" ondrop="drag_drop(event)" ondragover="return false" ondragleave="drag_leave(event)" ></div>
+    <img src="Images/compost.png" id="drop_zone3" ondragenter="drag_enter(event)" ondrop="drag_drop(event)" ondragover="return false" ondragleave="drag_leave(event)" ></div>
+    <img src="Images/reuse.png" id="drop_zone4" ondragenter="drag_enter(event)" ondrop="drag_drop(event)" ondragover="return false" ondragleave="drag_leave(event)" ></div>
+    <h2 id="app_status">App status...</h2>
+</body>
+
+<script>
+////////////////////////////////////////// SCRIPT ////////////////////////////////////////////////////////////
+
+// making array of all trash objects that can be dropped in the bins
+// category correlates to the correct bin
+const droppableObjects = [
+    {
+        name:"paper coffee cup",
+        url:"Images/coffeecup.png",
+        category:"3"
+    },
+    {
+        name:"metal water bottle",
+        url:"Images/metalwaterbottle.png",
+        category:"4"
+    },
+    {
+        name:"banana peel",
+        url:"Images/bananapeel.png",
+        category:"3"
+    },
+    {
+        name:"plastic-coated takeout box",
+        url:"Images/leftoverbox.png",
+        category:"1"
+    },
+    {
+        name:"plastic water bottle",
+        url:"Images/plasticwaterbottle.png",
+        category:"4"
+    },
+    {
+        name:"newspaper",
+        url:"Images/newspaper.png",
+        category:"2"
+    },
+    {
+        name:"CD",
+        url:"Images/cd.png",
+        category:"1"
+    },
+    {
+        name:"empty toothpaste tube",
+        url:"Images/toothpaste.png",
+        category:"2"
+    },
+    {
+        name:"rubber duck",
+        url:"Images/rubberduck.png",
+        category:"1"
+    },
+    {
+        name:"clothes",
+        url:"Images/clothes.png",
+        category:"4"
+    },
+];
+// global variables
+var timer = 0;
+var dropObjIndex = 0;
+
+// onloading this function before everything else
+function myOnload() {
+    document.body.style.backgroundImage = "url('Images/background.png')";
+    // set a timer to run a function every second
+    setInterval( printTime, 1000);
+    // create the first trash object
+    createDroppable();
+}
+
+// Updating the stopwatch
+function printTime() {
+    var minutes = Math.floor(timer / 60);
+    var seconds = timer % 60;
+    document.getElementById('stopwatch').innerHTML = minutes + ":" + seconds;
+    timer++;
+}
+
+// Creating a trash object everytime
+function createDroppable() {
+    document.getElementById('app_status').innerHTML = "Drag the object into the correct bin.";
+    var div = document.createElement('IMG');
+    div.id = droppableObjects[dropObjIndex].category;
+    div.src = droppableObjects[dropObjIndex].url;
+    div.draggable = true;
+    div.setAttribute('ondragstart', 'drag_start(event)');
+    div.setAttribute('ondragend', 'drag_end(event)');
+    div.style.marginLeft = 'auto';
+    div.style.marginRight = 'auto';
+    div.style.display = 'block';
+
+    // Add hover handlers for the object
+    div.addEventListener("mouseenter", function( event ) {
+        document.getElementById('app_status').innerHTML = "This is the " + droppableObjects[dropObjIndex].name;
+    }, false);
+
+    div.addEventListener("mouseleave", function( event ) {
+        document.getElementById('app_status').innerHTML = "Hover over an object to see what it is.";
+    }, false);
+
+    // Add object to the body, just before the first bin
+    var body = document.getElementsByTagName('body')[0];
+    var firstBin = document.getElementById('drop_zone1');
+    body.insertBefore(div, firstBin);  
+
+}
+
+var droppedIn = false;
+var correctBin = false;
+// Runs when user starts dragging an object
+function drag_start (event) {
+    node  = event.target.getAttribute('id');
+    document.getElementById('app_status').innerHTML = "Dragging the "+ droppableObjects[dropObjIndex].name;
+    event.dataTransfer.dropEffect = "move";
+    event.dataTransfer.setData("text", event.target.getAttribute('id') );
+}
+// Runs when user stops dragging an object
+function drag_end(event) {
+    if(droppedIn == false){
+        document.getElementById('app_status').innerHTML = "You let the "+ droppableObjects[dropObjIndex].name +" go.";
+    }
+	droppedIn = false;
+}
+// Runs when user drops a trash object into a drop zone
+function drag_drop (event) {
+    event.preventDefault(); 
+    var src_elem_id = event.dataTransfer.getData("text");
+    var target_elem_id = event.target.getAttribute('id');
+    var target_num = target_elem_id.substr(9, 1);
+
+    // Checks if the bin is correct
+    if(src_elem_id == target_num) {
+        event.target.appendChild(document.getElementById(src_elem_id));
+        document.getElementById('app_status').innerHTML = "Dropped "+src_elem_id+" into the "+target_elem_id;
+        document.getElementById(src_elem_id).removeAttribute("draggable");
+        document.getElementById(src_elem_id).style.cursor = "default";
+        droppedIn = true;
+        correctBin = true;
+        dropObjIndex = dropObjIndex + 1;
+        // Checking to make sure there are still additional trash objects to display
+        if (dropObjIndex < droppableObjects.length){
+            createDroppable();
+        }
+        else {
+            // Go to end screen
+            document.getElementById('app_status').innerHTML = "Dun";
+
+        }
+        
+    }
+    else {
+        document.getElementById('app_status').innerHTML = "Wrong bin, try again";
+        droppedIn = true;
+        correctBin = false;
+    }
+
+} 
+
+// adding all the event listeners to the bins
+let zone1 = document.getElementById("drop_zone1");
+let zone2 = document.getElementById("drop_zone2");
+let zone3 = document.getElementById("drop_zone3");
+let zone4 = document.getElementById("drop_zone4");
+
+zone1.addEventListener("mouseenter", function( event ) {
+    document.getElementById('app_status').innerHTML = "This is the landfill bin.";
+}, false);
+
+zone1.addEventListener("mouseleave", function( event ) {
+    document.getElementById('app_status').innerHTML = "Hover over an object to see what it is.";
+}, false);
+zone2.addEventListener("mouseenter", function( event ) {
+    document.getElementById('app_status').innerHTML = "This is the recycling bin.";
+}, false);
+
+zone2.addEventListener("mouseleave", function( event ) {
+    document.getElementById('app_status').innerHTML = "Hover over an object to see what it is.";
+}, false);
+zone3.addEventListener("mouseenter", function( event ) {
+    document.getElementById('app_status').innerHTML = "This is the compost bin.";
+}, false);
+
+zone3.addEventListener("mouseleave", function( event ) {
+    document.getElementById('app_status').innerHTML = "Hover over an object to see what it is.";
+}, false);
+zone4.addEventListener("mouseenter", function( event ) {
+    document.getElementById('app_status').innerHTML = "This is the reuseables bin.";
+}, false);
+
+zone4.addEventListener("mouseleave", function( event ) {
+    document.getElementById('app_status').innerHTML = "Hover over an object to see what it is.";
+}, false);
+
+
+
+</script>
+</head>
+</html>
