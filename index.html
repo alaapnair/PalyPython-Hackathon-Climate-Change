@@ -3,11 +3,23 @@
 <head>
 <style>
 /* CSS portion, adding styles for all objects */
+.startButtonClass {
+    position: absolute;
+    top: 60%;
+    left: 50%;
+    transform:translate(-50%, -50%);
+    transition: opacity 1s;
+    opacity: 1;
+}
+
 #stopwatch {
     display: inline-block;
     width: 500px;
-    margin-left: 90%;
+    margin-left: 80%;
     font-size: 40px;
+    opacity: 0;
+    transition: opacity 1s;
+
 }
 #drag_object {
     display:inline-block;
@@ -31,6 +43,8 @@
     font-size: 18px;
     text-align: center;
     cursor: move;
+    opacity: 0;
+    transition: opacity 1s;
 }
 #drop_zone2 {
     display:inline-block;
@@ -41,6 +55,9 @@
     font-size: 18px;
     text-align: center;
     cursor: move;
+    opacity: 0;
+    transition: opacity 2s;
+
 }
 #drop_zone3 {
     display:inline-block;
@@ -51,6 +68,9 @@
     font-size: 18px;
     text-align: center;
     cursor: move;
+    opacity: 0;
+    transition: opacity 3s;
+
 }
 #drop_zone4 {
     display:inline-block;
@@ -61,12 +81,21 @@
     font-size: 18px;
     text-align: center;
     cursor: move;
+    opacity: 0;
+    transition: opacity 4s;
+
+}
+#app_status {
+    opacity: 0;
+    transition: opacity 1s;
+
 }
 
 </style>
 <!-- html portion -->
 <body onload="myOnload()">
-    <label id = "stopwatch"> 0:0 </label> 
+    <button class = "startButtonClass" onclick="startGame()" id = "startButton" ><img src="Images/start.png"></button>
+    <label id = "stopwatch"> Your time: 0:0 </label> 
     <br>
     <br>
     <br>
@@ -102,6 +131,7 @@ const droppableObjects = [
         url:"Images/metalwaterbottle.png",
         category:"4"
     },
+    
     {
         name:"banana peel",
         url:"Images/bananapeel.png",
@@ -142,16 +172,37 @@ const droppableObjects = [
         url:"Images/clothes.png",
         category:"4"
     },
+   
 ];
 // global variables
 var timer = 0;
+var timerID;
 var dropObjIndex = 0;
 
 // onloading this function before everything else
 function myOnload() {
+    document.body.style.backgroundImage = "url('Images/thumbnail.png')";
+}
+function startGame() {
+    var button = document.getElementById("startButton")
+    button.parentNode.removeChild(button);
+    const fadeBin1 = document.getElementById("drop_zone1");
+    const fadeBin2 = document.getElementById("drop_zone2");
+    const fadeBin3 = document.getElementById("drop_zone3");
+    const fadeBin4 = document.getElementById("drop_zone4");
+    const fadeStatus = document.getElementById("app_status");
+    const fadeStopwatch = document.getElementById("stopwatch")
+
+    fadeBin1.style.opacity = '1';
+    fadeBin2.style.opacity = '1';
+    fadeBin3.style.opacity = '1';
+    fadeBin4.style.opacity = '1';
+    fadeStatus.style.opacity = '1';
+    fadeStopwatch.style.opacity = '1';
+
     document.body.style.backgroundImage = "url('Images/background.png')";
     // set a timer to run a function every second
-    setInterval( printTime, 1000);
+    timerID = setInterval( printTime, 1000);
     // create the first trash object
     createDroppable();
 }
@@ -160,7 +211,7 @@ function myOnload() {
 function printTime() {
     var minutes = Math.floor(timer / 60);
     var seconds = timer % 60;
-    document.getElementById('stopwatch').innerHTML = minutes + ":" + seconds;
+    document.getElementById('stopwatch').innerHTML ="Your time: " + minutes + ":" + seconds;
     timer++;
 }
 
@@ -230,8 +281,20 @@ function drag_drop (event) {
             createDroppable();
         }
         else {
+            
             // Go to end screen
-            document.getElementById('app_status').innerHTML = "Dun";
+            const bin1 = document.getElementById("drop_zone1");
+            const bin2 = document.getElementById("drop_zone2");
+            const bin3 = document.getElementById("drop_zone3");
+            const bin4 = document.getElementById("drop_zone4");
+            clearInterval(timerID);
+            bin1.style.opacity = '0';
+            bin2.style.opacity = '0';
+            bin3.style.opacity = '0';
+            bin4.style.opacity = '0'; 
+            app_status.style.display = "none";
+            setTimeout(addBackground, 1000);
+
 
         }
         
@@ -240,6 +303,11 @@ function drag_drop (event) {
         document.getElementById('app_status').innerHTML = "Wrong bin, try again";
         droppedIn = true;
         correctBin = false;
+    }
+    function addBackground() {
+        document.body.style.backgroundImage = "url('Images/youwingraphic.png')";
+
+
     }
 
 } 
